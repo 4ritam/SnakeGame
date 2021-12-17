@@ -9,11 +9,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="myCanvas" style="background-color: green;"></canvas>
-    <div id="main">
-        <label>Enter Your Name: </label><br>
-        <input type="text" placeholder="name" id="Name"></input><br>
-        <button>New Game</button>
+    <div id="body">
+        <canvas id="myCanvas" style="background-color: green;"></canvas>
+        <div class="screen">
+            <div id="main">
+                <label>Enter Your Name: </label><br>
+                <input type="text" placeholder="Name" id="name"></input><br>
+                <button id="start">New Game</button>
+                <h2 id="score">Score : 0</h2>
+            </div>
+            <div id="leaderboard">
+                <h1>Leaderboard</h1>
+            </div>
+        </div>
     </div>
 </body>
 </html>

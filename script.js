@@ -24,6 +24,18 @@ let fruitRadius = 6;
 
 let needFruit = true;
 
+
+let playing;
+
+let start = document.getElementById('start');
+
+let score = 0;
+let scoreboard = document.getElementById('score');
+
+
+
+
+
 class Snake {
     constructor(x, y, dx, dy, size){
         this.x = x;
@@ -48,29 +60,6 @@ let snakeInit = (initx, inity, size, snakes) => {
     }
 }
 
-
-
-let drawSnakes = (snakeB) =>{
-    for(let snakeblocks of snakeB){
-        snakeblocks.draw();
-    }
-}
-
-let moving = (snakeB)=>{
-    for(let snakeblocks of snakeB){
-        snakeblocks.x += snakeblocks.dx;
-        snakeblocks.y += snakeblocks.dy;
-    }
-}
-
-
-let borderCheck = (block) => {
-    if(block[0].x < 0 || block[0].x > canvas.width - blockSize || block[0].y < 0 || block[0].y > canvas.height - blockSize){
-        clearInterval(playing);
-        alert('You Lost');
-    }
-}
-
 let fruitRandomiser = () => {
     if(!needFruit) return;
     fruitX = Math.floor(Math.random() * (canvas.width - blockSize));
@@ -82,6 +71,7 @@ let fruitRandomiser = () => {
     
 }
 
+
 let addFruit = () => {
     ctx.beginPath();
     ctx.fillStyle = 'red';
@@ -90,6 +80,38 @@ let addFruit = () => {
     ctx.closePath();
     ctx.fillStyle = 'black';
 }
+
+let drawSnakes = (snakeB) =>{
+    for(let snakeblocks of snakeB){
+        snakeblocks.draw();
+    }
+}
+
+
+let moving = (snakeB)=>{
+    for(let snakeblocks of snakeB){
+        snakeblocks.x += snakeblocks.dx;
+        snakeblocks.y += snakeblocks.dy;
+    }
+}
+
+let movement = (e) => {
+    if(e.key === 'w'){
+        if(snakeBlocks[0].dy === delta) return;
+    }
+    if(e.key === 'a'){
+        if(snakeBlocks[0].dx === delta) return;
+    }
+    if(e.key === 's'){
+        if(snakeBlocks[0].dy === -delta) return;
+    }
+    if(e.key === 'd'){
+        if(snakeBlocks[0].dx === -delta) return;
+    }
+    isMoving = true;
+    ifMoving(e.key, 0);
+}
+
 
 let ifMoving = (key, numb) => {
     let count = numb;
@@ -116,22 +138,26 @@ let ifMoving = (key, numb) => {
     }, 40*(1/delta));
 }
 
-let movement = (e) => {
-    if(e.key === 'w'){
-        if(snakeBlocks[0].dy === delta) return;
+let borderCheck = (block) => {
+    for(let i=3; i<block.length; i++){
+        if(
+            (block[0].x < block[i].x + blockSize && block[0].x + blockSize> block[i].x)&&
+            (block[0].y < block[i].y + blockSize && block[0].y + blockSize> block[i].y)
+        ){
+            clearInterval(playing);
+            alert('You Lost');
+        }
     }
-    if(e.key === 'a'){
-        if(snakeBlocks[0].dx === delta) return;
-    }
-    if(e.key === 's'){
-        if(snakeBlocks[0].dy === -delta) return;
-    }
-    if(e.key === 'd'){
-        if(snakeBlocks[0].dx === -delta) return;
-    }
-    isMoving = true;
-    ifMoving(e.key, 0);
+    if(
+        !(
+            block[0].x < 0 || block[0].x > canvas.width - blockSize ||
+            block[0].y < 0 || block[0].y > canvas.height - blockSize
+        )
+    ) return;
+    clearInterval(playing);
+    alert('You Lost');
 }
+
 
 let collisionCheck = () => {
     if(
@@ -153,22 +179,31 @@ let collisionCheck = () => {
             snakeBlocks.push(new Snake(newBlock.x, newBlock.y, newBlock.dx, newBlock.dy, blockSize));
         }, 40*(1/delta))
         delta = delta+0.025;
+        score += 10;
     }
 }
 
+
+let scoreCheck = ()=>{
+    scoreboard.innerHTML = `Score : ${score}`;
+}
+
+
 let draw = ()=>{
     ctx.clearRect(0,0,canvas.width, canvas.height);
-
     fruitRandomiser();
     addFruit();
     drawSnakes(snakeBlocks);
     moving(snakeBlocks);
     borderCheck(snakeBlocks);
     collisionCheck();
+    scoreCheck();
 }
 
 snakeInit(250,200, blockSize, snakeLengthInit);
 
-let playing = setInterval(draw, 1);
+start.addEventListener('click', () =>{
+    playing = setInterval(draw, 1);
+})
 
 window.addEventListener('keyup', movement);
